@@ -4,9 +4,10 @@ clear all;
 close all;
 
 % Simulation parameters
-TOTAL_TIME  = 20;
+TOTAL_TIME  = 200;
 dt          = 0.02;
 TIME_SCALE  = 0.5; % slows down simulation if > 1, speeds up if < 1 (and if computation allows...)
+% TIME_SCALE = 2;
 
 
 % Initialise plot
@@ -51,7 +52,7 @@ for i = 2:csim.TotalSteps
     % to the odometry measurements variable 'y' and
     
     %%%%%%%%%%%%%%%%%%%%%%%% IMPLEMENT THIS SCRIPT %%%%%%%%%%%%%%%%%%%%%%%%
-    controller;
+    controllerQ2;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     % Simulation
