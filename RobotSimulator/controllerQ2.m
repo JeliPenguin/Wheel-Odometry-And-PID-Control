@@ -42,35 +42,41 @@ elseif phi < -pi
     phi=phi+2*pi;
 end
 
-if round(py,2) ~= 0 && halfCycleStart == 0
+if round(py,1) ~= 0 && halfCycleStart == 0
     halfCycleStart = 1;
 end
 
-if round(py,2) == 0 && halfCycleStart == 1
+if round(py,1) == 0 && halfCycleStart == 1
     halfCycleStart = 0;
     halfCycles = halfCycles + 1;
 end
 
 if halfCycles < wantedCycles * 2
+    % While robot hasn't finished desired number of cycles
     if init_walkup == 1
-        % Drive in straight line up to obstacle, then stop
-        % disp(front_distance1)
+        % Drive in straight line up to obstacle
         if (front_distance1>=(distance_from_obstacle+lw/2))
             e = odo_error;
             current_mode = 1;
         else
             init_walkup = 0;
-            u = [0;0];
+        end
+
+    elseif init_turn
+        % Turning the robot clockwise
+        emptySensor = round(left_distance1,1)==1.1 && round(left_distance2,1) ==1.1;
+        if (emptySensor || (~emptySensor && round(left_distance1,1) ~= round(left_distance2,1))) 
+            % Turning robot clockwise to be parrallel to the side of obstacle at its current position
+            u = [u_m;-u_m];
             current_mode = 0;
+        else
+            init_turn = 0;
+            sx = px;
+            sy = py;
         end
     else
         % disp([left_distance1,left_distance2,left_distance_error])
-        if (round(left_distance1,1)==1.1 && round(left_distance2,1) ==1.1)
-            % Turning robot clockwise at its current position while none of the
-            % left sensors encountered the obstacle
-            u = [u_m;-u_m];
-            current_mode = 0;
-        elseif (round(left_distance1,1) < distance_from_obstacle)
+        if (round(left_distance1,3) ~= distance_from_obstacle)
             e = desired_distance_error;
             current_mode = 3;
         else
@@ -98,12 +104,14 @@ if mode ~= current_mode
     ie = 0;
 end
 
+disp([mode,round(left_distance1,3),e])
+
 if mode ~= 0
     % If not manual control, then do PID
     de = (e-e_prev)/dt;
     ie = ie + e*dt;
     u_turn = Kp(mode)*e + Ki(mode)*ie + Kd(mode)*de;
-    u_m = 4/exp(e^2);
+    % u_m = 4/exp(e^2);
     u_l = u_m-u_turn;
     u_r = u_m+u_turn;
     u = [min(max(u_l,-6),6); ...
