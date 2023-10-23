@@ -42,11 +42,9 @@ elseif phi < -pi
     phi=phi+2*pi;
 end
 
-if round(py,1) ~= 0 && halfCycleStart == 0
+if round(py,1) ~= 0 && halfCycleStart == 0 && init_turn == 0
     halfCycleStart = 1;
-end
-
-if round(py,1) == 0 && halfCycleStart == 1
+elseif round(py,1) == 0 && halfCycleStart == 1
     halfCycleStart = 0;
     halfCycles = halfCycles + 1;
 end
@@ -62,7 +60,7 @@ if halfCycles < wantedCycles * 2
             init_walkup = 0;
         end
 
-    elseif init_turn
+    elseif init_turn == 1
         % Turning the robot clockwise
         emptySensor = round(left_distance1,1)==1.1 && round(left_distance2,1) ==1.1;
         if (emptySensor || (~emptySensor && round(left_distance1,2) ~= round(left_distance2,2))) 
@@ -71,8 +69,8 @@ if halfCycles < wantedCycles * 2
             current_mode = 0;
         else
             init_turn = 0;
-            sx = px;
-            sy = py;
+            % Slight offset to ensure cycle counting works
+            sy = py+10e-3;
         end
     else
         % disp([left_distance1,left_distance2,left_distance_error])
@@ -87,14 +85,19 @@ if halfCycles < wantedCycles * 2
     end
 else
     % Return back to start location
-    desiredPhi = atan2((ry-py),(rx-px));
-    e = desiredPhi-phi; % mode 4
-    if e > pi
-        e = e - 2*pi;
-    elseif e < -pi
-        e=e+2*pi;
+    if round(px,2) == round(rx,2) && round(py,2) == round(ry,2)
+        u = [0;0];
+        current_mode = 0;
+    else
+        desiredPhi = atan2((ry-py),(rx-px));
+        e = desiredPhi-phi;
+        if e > pi
+            e = e - 2*pi;
+        elseif e < -pi
+            e=e+2*pi;
+        end
+        current_mode = 4;
     end
-    current_mode = 4;
 end
 
 if mode ~= current_mode
@@ -103,7 +106,6 @@ if mode ~= current_mode
     e_prev = 0;
     ie = 0;
 end
-
 
 if mode ~= 0
     % If not manual control, then do PID
@@ -116,3 +118,5 @@ if mode ~= 0
          min(max(u_r,-6),6)];
     e_prev = e;
 end
+
+disp(u)

@@ -1,10 +1,10 @@
 e_prev = 0;
 ie = 0; %integral error
 
-% PID parameters
-Kp = [1.5,50,50,50];
-Ki = [0.5,5,5,5];
-Kd = [0,0,0,0];
+% PID parameters for different modes
+Kp = [1.5,50,30,10];
+Ki = [0.5,0.5,5,0.5];
+Kd = [0,0,5,0];
 
 % Constants
 distance_from_obstacle = 0.5;
