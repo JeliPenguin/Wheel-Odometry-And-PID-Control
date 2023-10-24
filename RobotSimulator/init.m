@@ -2,8 +2,8 @@ e_prev = 0;
 ie = 0; %integral error
 
 % PID parameters for different modes
-Kp = [1.5,50,30,10];
-Ki = [0.5,0.5,5,0.5];
+Kp = [1.5,50,50,10];
+Ki = [0.5,0.5,0.5,0.5];
 Kd = [0,0,0,0];
 
 % Constants

@@ -12,8 +12,9 @@ right_distanc2 = y(7);
 
 % Reference errors
 odo_error  = odo_left-odo_right; % mode 1
-left_distance_error1 = distance_from_obstacle - left_distance1; % mode 2
-left_distance_error2 = distance_from_obstacle - left_distance1; % mode 3
+left_distance_error = left_distance1 - left_distance2; % mode 2
+desired_distance_error = left_distance1 - distance_from_obstacle; % mode 3
+desired_distance_error2 = left_distance2 - distance_from_obstacle; % mode 3
 
 % Dynamics
 dTickL = odo_left - lastTickL;
@@ -63,7 +64,7 @@ if halfCycles < wantedCycles * 2
     elseif init_turn == 1
         % Turning the robot clockwise
         emptySensor = round(left_distance1,1)==1.1 && round(left_distance2,1) ==1.1;
-        if (emptySensor || (~emptySensor && round(left_distance1,3) ~= round(left_distance2,3))) 
+        if (emptySensor || (~emptySensor && round(left_distance1,2) ~= round(left_distance2,2))) 
             % Turning robot clockwise to be parrallel to the side of obstacle at its current position
             u = [u_m;-u_m];
             current_mode = 0;
@@ -75,12 +76,15 @@ if halfCycles < wantedCycles * 2
     else
         % disp([left_distance1,left_distance2,left_distance_error])
         if (round(left_distance1,3) ~= distance_from_obstacle)
-            e = left_distance_error1;
-            current_mode = 2;
+            e = desired_distance_error;
+            current_mode = 3;
         elseif (round(left_distance2,3) ~= distance_from_obstacle)
             % Following the edge of obstacle
-            e = left_distance_error2;
-            current_mode = 3;
+            e = left_distance_error;
+            current_mode = 2;
+        else
+            e = odo_error;
+            current_mode = 1;
         end
     end
 else
