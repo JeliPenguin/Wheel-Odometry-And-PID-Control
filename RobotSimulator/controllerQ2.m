@@ -75,10 +75,10 @@ if halfCycles < wantedCycles * 2
         end
     else
         % disp([left_distance1,left_distance2,left_distance_error])
-        if (round(left_distance1,3) ~= distance_from_obstacle)
+        if (round(left_distance1,4) ~= distance_from_obstacle)
             e = desired_distance_error;
             current_mode = 3;
-        elseif (round(left_distance2,3) ~= distance_from_obstacle)
+        elseif (round(left_distance2,4) ~= distance_from_obstacle)
             % Following the edge of obstacle
             e = left_distance_error;
             current_mode = 2;
