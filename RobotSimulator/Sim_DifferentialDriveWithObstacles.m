@@ -34,7 +34,7 @@ robot.plot;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%% IMPLEMENT THIS SCRIPT %%%%%%%%%%%%%%%%%%%%%%%%
-init;
+initQ1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 time = nan(1,csim.TotalSteps-1);
@@ -52,7 +52,7 @@ for i = 2:csim.TotalSteps
     % to the odometry measurements variable 'y' and
     
     %%%%%%%%%%%%%%%%%%%%%%%% IMPLEMENT THIS SCRIPT %%%%%%%%%%%%%%%%%%%%%%%%
-    controllerQ2;
+    controllerQ1;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     % Simulation
