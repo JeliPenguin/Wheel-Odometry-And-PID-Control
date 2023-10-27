@@ -14,6 +14,7 @@ right_distanc2 = y(7);
 odo_error  = odo_left-odo_right; % mode 1
 left_distance_error = left_distance1 - left_distance2; % mode 2
 desired_distance_error = left_distance1 - distance_from_obstacle; % mode 3
+desired_distance_error2 = left_distance2 - distance_from_obstacle; % mode 3
 
 % Dynamics
 dTickL = odo_left - lastTickL;
@@ -42,53 +43,65 @@ elseif phi < -pi
     phi=phi+2*pi;
 end
 
-if round(py,2) ~= 0 && halfCycleStart == 0
+if round(py,1) ~= 0 && halfCycleStart == 0 && init_turn == 0
     halfCycleStart = 1;
-end
-
-if round(py,2) == 0 && halfCycleStart == 1
+elseif round(py,1) == 0 && halfCycleStart == 1
     halfCycleStart = 0;
     halfCycles = halfCycles + 1;
 end
 
 if halfCycles < wantedCycles * 2
+    % While robot hasn't finished desired number of cycles
     if init_walkup == 1
-        % Drive in straight line up to obstacle, then stop
-        % disp(front_distance1)
-        if (front_distance1>=(distance_from_obstacle+lw/2))
+        % Drive in straight line up to obstacle
+        if (front_distance1>=(distance_from_obstacle+lw/2-0.1))
             e = odo_error;
             current_mode = 1;
         else
             init_walkup = 0;
-            u = [0;0];
+        end
+
+    elseif init_turn == 1
+        % Turning the robot clockwise
+        emptySensor = round(left_distance1,1)==1.1 && round(left_distance2,1) ==1.1;
+        if (emptySensor || (~emptySensor && round(left_distance1,2) ~= round(left_distance2,2))) 
+            % Turning robot clockwise to be parrallel to the side of obstacle at its current position
+            u = [u_m;-u_m];
             current_mode = 0;
+        else
+            init_turn = 0;
+            % Slight offset to ensure cycle counting works
+            sy = py+10e-3;
         end
     else
         % disp([left_distance1,left_distance2,left_distance_error])
-        if (round(left_distance1,1)==1.1 && round(left_distance2,1) ==1.1)
-            % Turning robot clockwise at its current position while none of the
-            % left sensors encountered the obstacle
-            u = [u_m;-u_m];
-            current_mode = 0;
-        elseif (round(left_distance1,1) < distance_from_obstacle)
+        if (round(left_distance1,4) ~= distance_from_obstacle)
             e = desired_distance_error;
             current_mode = 3;
-        else
+        elseif (round(left_distance2,4) ~= distance_from_obstacle)
             % Following the edge of obstacle
             e = left_distance_error;
             current_mode = 2;
+        else
+            e = odo_error;
+            current_mode = 1;
         end
     end
 else
     % Return back to start location
-    desiredPhi = atan2((ry-py),(rx-px));
-    e = desiredPhi-phi; % mode 4
-    if e > pi
-        e = e - 2*pi;
-    elseif e < -pi
-        e=e+2*pi;
+    if round(px,2) == round(rx,2) && round(py,2) == round(ry,2)
+        u = [0;0];
+        current_mode = 0;
+    else
+        desiredPhi = atan2((ry-py),(rx-px));
+        e = desiredPhi-phi;
+        if e > pi
+            e = e - 2*pi;
+        elseif e < -pi
+            e=e+2*pi;
+        end
+        current_mode = 4;
     end
-    current_mode = 4;
 end
 
 if mode ~= current_mode
@@ -103,10 +116,11 @@ if mode ~= 0
     de = (e-e_prev)/dt;
     ie = ie + e*dt;
     u_turn = Kp(mode)*e + Ki(mode)*ie + Kd(mode)*de;
-    u_m = 4/exp(e^2);
     u_l = u_m-u_turn;
     u_r = u_m+u_turn;
     u = [min(max(u_l,-6),6); ...
          min(max(u_r,-6),6)];
     e_prev = e;
 end
+
+disp(u)
