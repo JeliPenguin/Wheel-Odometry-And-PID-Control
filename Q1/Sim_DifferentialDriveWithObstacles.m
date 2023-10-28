@@ -4,10 +4,9 @@ clear all;
 close all;
 
 % Simulation parameters
-TOTAL_TIME  = 100;
+TOTAL_TIME  = 30;
 dt          = 0.02;
-TIME_SCALE  = 0.1; % slows down simulation if > 1, speeds up if < 1 (and if computation allows...)
-% TIME_SCALE = 2;
+TIME_SCALE  = 0.05; % slows down simulation if > 1, speeds up if < 1 (and if computation allows...)
 
 
 % Initialise plot
@@ -63,4 +62,16 @@ for i = 2:csim.TotalSteps
     drawnow nocallbacks limitrate
     time(i-1) = toc;
     pause(TIME_SCALE*dt-toc); 
+    
 end
+
+% Q1 Calculate wheel radius
+tpr = 64; % ticks per wheel revolution
+wheel_rev = ((y1e - y1s + y2e - y2s)/2)/tpr;
+wheel_rad = (dist / wheel_rev) / (2*pi);
+disp("Wheel radius is: " + wheel_rad);
+
+% Q1 Calculate distance between wheels
+revo_count = circle_diff / 64;
+wheel_dist = revo_count * wheel_rad;
+disp("Wheel distance is: " + wheel_dist);
