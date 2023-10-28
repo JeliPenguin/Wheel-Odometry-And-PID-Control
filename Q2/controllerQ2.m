@@ -1,126 +1,355 @@
-% Odometer reading
-odo_left  = y(1);
-odo_right = y(2);
+% % Q1(1)
+% if y(1)<180
+%     e = y(1)-y(2);
+%     ed = (e-e_prev)/dt;
+%     ei = ei + e*dt;
+%     
+%     u_e = Kp*e + Ki*ei + Kd*ed; 
+%     
+%     u_m = 4;
+%     
+%     u=[u_m-u_e;u_m+u_e];
+% else
+%     u = [0,0];
+% end
 
-% Sensor reading
-front_distance1 = y(3);
-front_distance2 = y(4);
-left_distance1 = y(5);
-left_distance2 = y(6);
-right_distance1 = y(7);
-right_distanc2 = y(7);
 
-% Reference errors
-odo_error  = odo_left-odo_right; % mode 1
-left_distance_error = left_distance1 - left_distance2; % mode 2
-desired_distance_error = left_distance1 - distance_from_obstacle; % mode 3
-desired_distance_error2 = left_distance2 - distance_from_obstacle; % mode 3
 
-% Dynamics
-dTickL = odo_left - lastTickL;
-dTickR = odo_right - lastTickR;
-lastTickL = odo_left;
-lastTickR = odo_right;
-dL = 2 * pi * r * (dTickL/nTicks);
-dR = 2 * pi * r * (dTickR/nTicks);
+% % Q1(2)
+% u = [4,-4];
 
-% Forward Kinematics
-sR = dR / dt;
-sL = dL / dt;
-sm = (sL + sR)/2;
-phiDot = (sR-sL)/lw;
-if phiDot ~= 0 
-    px = px + sm * (sin(phiDot * dt+phi)-sin(phi))/phiDot;
-    py = py - sm * (cos(phiDot * dt+phi)-cos(phi))/phiDot;
+% %Q2
+% % forwardKinematic
+% dl = 2*pi*Rw*(y(1)-y1_p)/64;
+% dr = 2*pi*Rw*(y(2)-y2_p)/64;
+% sl = dl/dt;
+% sr = dr/dt;
+% sm = 0.5*(sl+sr);
+% alpha = (dr-dl)/lw;
+% theta_p = alpha/dt;
+% 
+% if theta_p ~= 0 
+%     x_e = x_e + (sm/theta_p)*(sin(theta + theta_p*dt)-sin(theta));
+%     y_e = y_e - (sm/theta_p)*(cos(theta + theta_p*dt)-cos(theta));
+% 
+% else
+%     x_e = x_e + sm*cos(theta)*dt;
+%     y_e = y_e + sm*sin(theta)*dt;
+% 
+% end
+% theta = theta + theta_p*dt;
+% 
+% y1_p = y(1);
+% y2_p = y(2);
+% 
+% if theta > pi
+%     theta = theta-2*pi;
+% end
+% if theta < -pi
+%     theta = theta+2*pi;
+% end
+% 
+% 
+% % PID control
+% if label == 0 % go forward in straight segment
+%     if y(3) < 0.5 || y(4) < 0.5 
+%         % reach the end of straight segment
+%         label = 1;  % change to next state
+%         ed = 0;
+%         ei = 0;
+%         e_prev = 0;
+%         u = [0,0];
+% 
+% %         % start rounding point;
+% %         label4_odo_x = x_e;
+% %         label4_odo_y = y_e;
+% 
+%     else
+%         % input error is ticks' difference
+%         e = y(1)-y(2);
+%         ed = (e-e_prev)/dt;
+%         ei = ei + e*dt;
+%         u_e = 5*e + 0.25*ei + 0*ed; 
+%         u_m = 3;
+%         u=[u_m-u_e;u_m+u_e];
+%     end
+% 
+% elseif label == 1 % rotate 90° such that we could take use of y(5)&y(6)
+%     if y(5) < 0.5  || y(6) < 0.5 
+%         label = 2;  % change to next state
+%         ed = 0;
+%         ei = 0;
+%         e_prev = 0;
+%         u = [0,0];
+%         start = y(1); % mark down start ticks 
+%     else
+%         % keep on ratation
+%         u = [4;-4];
+%     end
+% 
+% elseif label == 2 % start to move counter clock-wise
+%     if y(1) < ntick + start % until 2 rounds
+%         e = y(5)-0.5;
+%         ed = (e-e_prev)/dt;
+%         ei = ei + e*dt;
+%         u_e = Kp*e + Ki*ei + Kd*ed; 
+%         u_m = 3;
+%         u=[u_m-u_e;u_m+u_e];
+%     else 
+%         label = 3; % change to next state
+%         ed = 0;
+%         ei = 0;
+%         e_prev = 0;
+%         u = [0,0];
+%     end
+% 
+% elseif label == 3 % rotate to 0° angle
+%     disp(abs(y(3)-abs(y(4))))
+%     if (y(3)-0.5)^2 < 0.001 && (y(4)-0.5)^2 < 0.001 && abs(y(3)-y(4)) < 0.00001
+%         label = 4;  % change to next state
+%         ed = 0;
+%         ei = 0;
+%         e_prev = 0;
+%         u = [0,0];
+%         tick_1 = y(1);
+%         tick_2 = y(2);
+%     else
+%         % keep on ratation
+%         if (y(3)-0.5)^2 < 0.001 && (y(4)-0.5)^2 < 0.001
+%             u = [-0.01;0.01];
+%         else
+%             u = [-4,4];
+%         end
+%     end
+%   
+% elseif label == 4 % go backward in straight segment
+%     if x_e > 0
+%         e = (tick_1-y(1))-(tick_2-y(2));
+%         ed = (e-e_prev)/dt;
+%         ei = ei + e*dt;
+%         
+%         u_e = 5*e + 0.25*ei + 0*ed; 
+%         u_m = -3;
+%         
+%         u=[u_m+u_e;u_m-u_e];
+% 
+%     else 
+%         ei = 0;
+%         ed = 0;
+%         u = [0,0];
+%     end
+% 
+% end
+
+
+%Q2 version2
+% forwardKinematic
+dl = 2*pi*Rw*(y(1)-y1_p)/64;
+dr = 2*pi*Rw*(y(2)-y2_p)/64;
+sl = dl/dt;
+sr = dr/dt;
+sm = 0.5*(sl+sr);
+alpha = (dr-dl)/lw;
+theta_p = alpha/dt;
+
+if theta_p ~= 0 
+    x_e = x_e + (sm/theta_p)*(sin(theta + theta_p*dt)-sin(theta));
+    y_e = y_e - (sm/theta_p)*(cos(theta + theta_p*dt)-cos(theta));
+
 else
-    px = px + sm*dt*cos(phi);
-    py = py + sm*dt*sin(phi);
+    x_e = x_e + sm*cos(theta)*dt;
+    y_e = y_e + sm*sin(theta)*dt;
+
 end
-phi = phi + phiDot * dt;
-if phi > pi
-    phi = phi - 2*pi;
-elseif phi < -pi
-    phi=phi+2*pi;
+theta = theta + theta_p*dt;
+
+y1_p = y(1);
+y2_p = y(2);
+
+if theta > pi
+    theta = theta-2*pi;
+end
+if theta < -pi
+    theta = theta+2*pi;
 end
 
-if round(py,1) ~= 0 && halfCycleStart == 0 && init_turn == 0
-    halfCycleStart = 1;
-elseif round(py,1) == 0 && halfCycleStart == 1
-    halfCycleStart = 0;
-    halfCycles = halfCycles + 1;
-end
 
-if halfCycles < wantedCycles * 2
-    % While robot hasn't finished desired number of cycles
-    if init_walkup == 1
-        % Drive in straight line up to obstacle
-        if (front_distance1>=(distance_from_obstacle+lw/2-0.1))
-            e = odo_error;
-            current_mode = 1;
-        else
-            init_walkup = 0;
-        end
+% PID control
+if label == 0 % go forward in straight segment
+    if abs(y(3)-0.5) < 0.002 || abs(y(4)-0.5) < 0.002
+        % reach the end of straight segment
+        label = 1;  % change to next state
+        ed = 0;
+        ei = 0;
+        e_prev = 0;
+        u = [0,0];
+        before_tick = y(1);
 
-    elseif init_turn == 1
-        % Turning the robot clockwise
-        emptySensor = round(left_distance1,1)==1.1 && round(left_distance2,1) ==1.1;
-        if (emptySensor || (~emptySensor && round(left_distance1,2) ~= round(left_distance2,2))) 
-            % Turning robot clockwise to be parrallel to the side of obstacle at its current position
-            u = [u_m;-u_m];
-            current_mode = 0;
-        else
-            init_turn = 0;
-            % Slight offset to ensure cycle counting works
-            sy = py+10e-3;
-        end
     else
-        % disp([left_distance1,left_distance2,left_distance_error])
-        if (round(left_distance1,4) ~= distance_from_obstacle)
-            e = desired_distance_error;
-            current_mode = 3;
-        elseif (round(left_distance2,4) ~= distance_from_obstacle)
-            % Following the edge of obstacle
-            e = left_distance_error;
-            current_mode = 2;
-        else
-            e = odo_error;
-            current_mode = 1;
-        end
+        % input error is ticks' difference
+        e = y(1)-y(2);
+        ed = (e-e_prev)/dt;
+        ei = ei + e*dt;
+        u_e = 1.5*e + 0.1*ei + 0*ed; 
+        u_m = 2;
+        u=[u_m-u_e;u_m+u_e];
+
     end
-else
-    % Return back to start location
-    if round(px,2) == round(rx,2) && round(py,2) == round(ry,2)
-        u = [0;0];
-        current_mode = 0;
+
+elseif label == 1 % rotate 90° such that we could take use of y(5)&y(6)
+    if abs(y(5)-y(6)) < 0.001 && abs(y(5)-0.5)<0.1
+        label = 2;  % change to next state
+        ed = 0;
+        ei = 0;
+        e_prev = 0;
+        u = [0,0];
+        after_tick = y(1); % mark down start ticks
     else
-        desiredPhi = atan2((ry-py),(rx-px));
-        e = desiredPhi-phi;
-        if e > pi
-            e = e - 2*pi;
-        elseif e < -pi
-            e=e+2*pi;
-        end
-        current_mode = 4;
+        % keep on ratation
+        u = [0.5;-0.5];
     end
+
+elseif label == 2 % start to move counter clock-wise
+    if y(1) < ntick + after_tick % until 2 rounds
+        e = y(5)-0.5;
+        ed = (e-e_prev)/dt;
+        ei = ei + e*dt;
+        u_e = Kp*e + Ki*ei + Kd*ed; 
+        u_m = 3;
+        u=[u_m-u_e;u_m+u_e];
+
+    else 
+        label = 3; % change to next state
+        ed = 0;
+        ei = 0;
+        e_prev = 0;
+        u = [0,0];
+    end
+
+
+elseif label == 3 % then rotate to 0° angle
+    if (theta)^2 < 0.0001
+        label = 4;  % change to next state
+        ed = 0;
+        ei = 0;
+        e_prev = 0;
+        u = [0,0];
+        tick_1 = y(1);
+        tick_2 = y(2);
+    else
+        u = [0.5*theta,-0.5*theta];
+    end
+  
+elseif label == 4 % go backward in straight segment
+    if x_e > 0
+        e = (tick_1-y(1))-(tick_2-y(2));
+        ed = (e-e_prev)/dt;
+        ei = ei + e*dt;
+        
+        u_e = 1.5*e + 0.1*ei + 0*ed; 
+        u_m = -2.5;
+        
+        u=[u_m+u_e;u_m-u_e];
+
+    else 
+        ei = 0;
+        ed = 0;
+        u = [0,0];
+    end
+
 end
 
-if mode ~= current_mode
-    % Resetting PID parameters when changing mode
-    mode = current_mode;
-    e_prev = 0;
-    ie = 0;
-end
 
-if mode ~= 0
-    % If not manual control, then do PID
-    de = (e-e_prev)/dt;
-    ie = ie + e*dt;
-    u_turn = Kp(mode)*e + Ki(mode)*ie + Kd(mode)*de;
-    u_l = u_m-u_turn;
-    u_r = u_m+u_turn;
-    u = [min(max(u_l,-6),6); ...
-         min(max(u_r,-6),6)];
-    e_prev = e;
-end
 
-disp(u)
+% % Q3
+% % forwardKinematic
+% dl = 2*pi*Rw*(y(1)-y1_p)/64;
+% dr = 2*pi*Rw*(y(2)-y2_p)/64;
+% sl = dl/dt;
+% sr = dr/dt;
+% sm = 0.5*(sl+sr);
+% alpha = (dr-dl)/lw;
+% theta_p = alpha/dt;
+% 
+% if theta_p ~= 0 
+%     x_e = x_e + (sm/theta_p)*(sin(theta + theta_p*dt)-sin(theta));
+%     y_e = y_e - (sm/theta_p)*(cos(theta + theta_p*dt)-cos(theta));
+% 
+% else
+%     x_e = x_e + sm*cos(theta)*dt;
+%     y_e = y_e + sm*sin(theta)*dt;
+% 
+% end
+% theta = theta + theta_p*dt;
+% 
+% y1_p = y(1);
+% y2_p = y(2);
+% 
+% % make sure the range of thera is between [-pi,pi]
+% if theta > pi
+%     theta = theta-2*pi;
+% end
+% if theta < -pi
+%     theta = theta+2*pi;
+% end
+% 
+% if label < 100
+%     if abs(x_e-x_d) < 0.005 && abs(y_e-y_d) < 0.005
+%         label = label+1;
+%         x_d = lst(label,1);
+%         y_d = lst(label,2);
+%         e_i = 0;
+%         e_prev = 0;
+%         u = [0,0];
+%     else
+%         e = atan2((y_d-y_e),(x_d-x_e)) - theta;
+%     
+%         % make sure the range of e is between [-pi,pi]
+%         if e > pi
+%             e = e-2*pi;
+%         end
+%         if e < -pi
+%             e = e+2*pi;
+%         end
+%         
+%         ed = (e-e_prev)/dt;
+%         ei = ei + e*dt;
+%         
+%         u_e = Kp*e + Ki*ei + Kd*ed; 
+%         e_prev = e;
+%         
+%         %inverseKinematic
+%         u_m = 2;
+%         
+%         ul = max(min(u_m - u_e,6),-6);
+%         ur = max(min(u_m + u_e,6),-6);
+%         u =  [ul,ur];
+%     end
+% 
+% elseif label == 100
+%     if abs(theta) < 0.001
+%         e_i = 0;
+%         e_prev = 0;
+%         u = [0,0];
+% 
+%     else
+%         u = [2*theta,-2*theta];
+%     end
+% end
+
+
+% % Q4
+% e = y(1)-y(2);
+% ed = (e-e_prev)/dt;
+% ei = ei + e*dt;
+% 
+% u_e = Kp*e + Ki*ei + Kd*ed; 
+% 
+% u_m = 4;
+% 
+% u=[u_m-u_e;u_m+u_e];
+% 
+% 
+% if mod(i,100) == 0 && i>100
+%     disp((csim.Log.Output(2,i-1)-csim.Log.Output(2,i-101))/(0.02*100));
+% end

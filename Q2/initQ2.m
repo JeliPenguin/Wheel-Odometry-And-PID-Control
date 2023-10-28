@@ -1,35 +1,98 @@
+% % Q1(1）
+% Kp = 2.5;
+% Ki = .5;
+% Kd = 0;
+% 
+% % integral error
+% ei = 0;
+% 
+% % previous error (for derivative)
+% e_prev = 0;
+% 
+% %initial voltage
+% u=[4;4];
+
+% % Q1(2）
+% u = [4;-4];
+
+% Q2
+% kid factors
+Kp = 100;
+Ki = 10;
+Kd = 0;
+
+% integral error
+ei = 0;
+
+% previous error (for derivative)
 e_prev = 0;
-ie = 0; %integral error
 
-% PID parameters for different modes
-Kp = [1.5,50,50,10];
-Ki = [0.5,0.5,0.5,0.5];
-Kd = [0,0,0,0];
+%initial voltage
+u=[0;0];
 
-% Constants
-distance_from_obstacle = 0.5;
-lw = 0.25;
-r = 0.1;
-nTicks = 64;
-u_m = 4;
-sx = -10; % Starting point of circulating precedure
-sy = -10; % Starting point of circulating precedure
-ry = 0;
-rx = 0;
-wantedCycles = 1;
+% previous tick counts
+y1_p=0;
+y2_p=0;
 
-% Variables
-init_walkup = 1;
-init_turn = 1;
-mode = 1; % 0 for manual u, 1 for odo_error, 2 for left_distance_error, 3 for desired_distance_error, 4 for angular_error
-current_mode = 1;
-px = 0;
-py = 0;
-lastTickL = 0;
-lastTickR = 0;
-phi = 0;
-halfCycles = 0;
-halfCycleStart = 0;
+% defferential driver parmeters
+lw = 0.250;
+Rw = 0.100;
+x_e = 0;
+y_e = 0;
+theta = 0;
+
+% label of states
+label = 0;
+
+start = 0; % start ticks
+ntick = 1810; % two round ticks
 
 
+% % Q3
+% % the list containing all reference points
+% lst = [0.4583,0;0.9176,0;1.375,0;1.375,-0.333;1.375,-0.667;1.375,-1;2-0.625*cos(pi/16),-1-0.625*sin(pi/16);2-0.625*cos(2*pi/16),-1-0.625*sin(2*pi/16);2-0.625*cos(3*pi/16),-1-0.625*sin(3*pi/16);...
+% 2-0.625*cos(4*pi/16),-1-0.625*sin(4*pi/16);2-0.625*cos(5*pi/16),-1-0.625*sin(5*pi/16);2-0.625*cos(6*pi/16),-1-0.625*sin(6*pi/16);2-0.625*cos(7*pi/16),-1-0.625*sin(7*pi/16);...
+% 2,-1.625;2.5,-1.625;3,-1.625;3+0.625*sin(pi/16),-1-0.625*cos(pi/16);3+0.625*sin(2*pi/16),-1-0.625*cos(2*pi/16);3+0.625*sin(3*pi/16),-1-0.625*cos(3*pi/16);...
+% 3+0.625*sin(4*pi/16),-1-0.625*cos(4*pi/16);3+0.625*sin(5*pi/16),-1-0.625*cos(5*pi/16);3+0.625*sin(6*pi/16),-1-0.625*cos(6*pi/16);3+0.625*sin(7*pi/16),-1-0.625*cos(7*pi/16);...
+% 3.625,-1;3.625,-0.5;3.625,0;3.625,0.5;3.625,1;3+0.625*cos(pi/16),1+0.625*sin(pi/16);3+0.625*cos(2*pi/16),1+0.625*sin(2*pi/16);3+0.625*cos(3*pi/16),1+0.625*sin(3*pi/16);...
+% 3+0.625*cos(4*pi/16),1+0.625*sin(4*pi/16);3+0.625*cos(5*pi/16),1+0.625*sin(5*pi/16);3+0.625*cos(6*pi/16),1+0.625*sin(6*pi/16);3+0.625*cos(7*pi/16),1+0.625*sin(7*pi/16);...
+% 3,1.625;2.5,1.625;2,1.625;2-0.625*sin(pi/16),1+0.625*cos(pi/16);2-0.625*sin(2*pi/16),1+0.625*cos(2*pi/16);2-0.625*sin(3*pi/16),1+0.625*cos(3*pi/16);...
+% 2-0.625*sin(4*pi/16),1+0.625*cos(4*pi/16);2-0.625*sin(5*pi/16),1+0.625*cos(5*pi/16);2-0.625*sin(6*pi/16),1+0.625*cos(6*pi/16);2-0.625*sin(7*pi/16),1+0.625*cos(7*pi/16);...
+% 1.375,1;1.375,0.667;1.375,0.333;1.375,0;1.375,-0.333;1.375,-0.667;1.375,-1;2-0.625*cos(pi/16),-1-0.625*sin(pi/16);2-0.625*cos(2*pi/16),-1-0.625*sin(2*pi/16);2-0.625*cos(3*pi/16),-1-0.625*sin(3*pi/16);...
+% 2-0.625*cos(4*pi/16),-1-0.625*sin(4*pi/16);2-0.625*cos(5*pi/16),-1-0.625*sin(5*pi/16);2-0.625*cos(6*pi/16),-1-0.625*sin(6*pi/16);2-0.625*cos(7*pi/16),-1-0.625*sin(7*pi/16);...
+% 2,-1.625;2.5,-1.625;3,-1.625;3+0.625*sin(pi/16),-1-0.625*cos(pi/16);3+0.625*sin(2*pi/16),-1-0.625*cos(2*pi/16);3+0.625*sin(3*pi/16),-1-0.625*cos(3*pi/16);...
+% 3+0.625*sin(4*pi/16),-1-0.625*cos(4*pi/16);3+0.625*sin(5*pi/16),-1-0.625*cos(5*pi/16);3+0.625*sin(6*pi/16),-1-0.625*cos(6*pi/16);3+0.625*sin(7*pi/16),-1-0.625*cos(7*pi/16);...
+% 3.625,-1;3.625,-0.5;3.625,0;3.625,0.5;3.625,1;3+0.625*cos(pi/16),1+0.625*sin(pi/16);3+0.625*cos(2*pi/16),1+0.625*sin(2*pi/16);3+0.625*cos(3*pi/16),1+0.625*sin(3*pi/16);...
+% 3+0.625*cos(4*pi/16),1+0.625*sin(4*pi/16);3+0.625*cos(5*pi/16),1+0.625*sin(5*pi/16);3+0.625*cos(6*pi/16),1+0.625*sin(6*pi/16);3+0.625*cos(7*pi/16),1+0.625*sin(7*pi/16);...
+% 3,1.625;2.5,1.625;2,1.625;2-0.625*sin(pi/16),1+0.625*cos(pi/16);2-0.625*sin(2*pi/16),1+0.625*cos(2*pi/16);2-0.625*sin(3*pi/16),1+0.625*cos(3*pi/16);...
+% 2-0.625*sin(4*pi/16),1+0.625*cos(4*pi/16);2-0.625*sin(5*pi/16),1+0.625*cos(5*pi/16);2-0.625*sin(6*pi/16),1+0.625*cos(6*pi/16);2-0.625*sin(7*pi/16),1+0.625*cos(7*pi/16);...
+% 1.375,1;1.375,0.667;1.375,0.333;1.375,0;1.03125,0;0.6875,0;0.34375,0;0,0;0,0];
+% label = 1;
+% x_d = 0.4583;
+% y_d = 0;
+% 
+% 
+% % kid factors
+% Kp = 10;
+% Ki = 0.2;
+% Kd = 0;
+% 
+% % integral error
+% ei = 0;
+% 
+% % previous error (for derivative)
+% e_prev = 0;
+% 
+% %initial voltage
+% u=[0;0];
+% 
+% % previous tick counts
+% y1_p=0;
+% y2_p=0;
+% 
+% lw = 0.250;
+% Rw = 0.100;
+% x_e = 0;
+% y_e = 0;
+% theta = 0;
 
