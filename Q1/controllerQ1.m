@@ -4,7 +4,7 @@ de = (e - e_prev) / dt;
 ie = ie + e * dt;
 e_prev = e;
 ctrl = Kp * e + Ki * ie + Kd * de;
-u = [4 - ctrl; 4 + ctrl];
+u = [2 - ctrl; 2 + ctrl];
 
 % collect odometry reading from start point to end point
 % this is for wheel radius calculation
@@ -27,11 +27,11 @@ end
 
 switch current_state
     case state(1)
-        u = [4, 0];
+        u = [2, 0];
         spin_timer = spin_timer + 1;
         dis1 = abs(y(3) - en);
         dis2 = abs(y(4) - en);
-        if (((dis1 + dis2)/2) <= 0.008) && (spin_timer >= 30)
+        if (((dis1 + dis2)/2) <= 0.005) && (spin_timer >= 30) && (abs(y(3) - en) <= 0.004)
             current_state = state(2);
         end
     case state(2)

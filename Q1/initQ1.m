@@ -14,9 +14,9 @@ y2s = 0;
 y1e = 0;
 y2e = 0;
 
-Kp = 2.5;
-Ki = 0.5;
-Kd = 0.1;
+Kp = 1.25;
+Ki = 0.1;
+Kd = 0;
 
 % these are for controlling different states for calculations
 calc2 = false;

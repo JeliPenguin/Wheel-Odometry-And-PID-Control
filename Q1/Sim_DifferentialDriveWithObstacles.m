@@ -4,9 +4,9 @@ clear all;
 close all;
 
 % Simulation parameters
-TOTAL_TIME  = 30;
+TOTAL_TIME  = 40;
 dt          = 0.02;
-TIME_SCALE  = 0.05; % slows down simulation if > 1, speeds up if < 1 (and if computation allows...)
+TIME_SCALE  = 0.01; % slows down simulation if > 1, speeds up if < 1 (and if computation allows...)
 
 
 % Initialise plot
@@ -65,13 +65,25 @@ for i = 2:csim.TotalSteps
     
 end
 
+% Below is the data we collected throughout 10 runs. These are used for
+% the report.
+wrs = [0.099862, 0.099942, 0.099862, 0.099862, 0.099862, 0.099862, 0.099862, 0.097942, 0.099862, 0.099862];
+wds = [0.24965, 0.24932, 0.24809, 0.25122, 0.24809, 0.24965, 0.24965, 0.24332, 0.24965, 0.24809];
+T = table(wrs', wds', 'VariableNames', {'wheel_radius', 'wheel_distance'});
+disp(T)
+disp("The average radius is: " + mean(wrs));
+disp("The average distance is: " + mean(wds));
+
 % Q1 Calculate wheel radius
 tpr = 64; % ticks per wheel revolution
 wheel_rev = ((y1e - y1s + y2e - y2s)/2)/tpr;
 wheel_rad = (dist / wheel_rev) / (2*pi);
-disp("Wheel radius is: " + wheel_rad);
+disp("In this run, wheel radius is: " + wheel_rad);
 
 % Q1 Calculate distance between wheels
 revo_count = circle_diff / 64;
 wheel_dist = revo_count * wheel_rad;
-disp("Wheel distance is: " + wheel_dist);
+disp("In this run, wheel distance is: " + wheel_dist);
+
+
+
