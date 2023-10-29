@@ -1,7 +1,7 @@
 % Testing Kp within the range [start,stop] with indicated step size
-start = 5.04992;
-stop = 6;
-step = 0.0000001;
+start = 0;
+stop = 10;
+step = 0.1;
 
 [bestKp,lastBestKp] = kpTuning(start,stop,step);
 
@@ -15,10 +15,11 @@ function [bestKp,lastBestKp] = kpTuning(start,stop,step)
     for i = start:step:stop
         % Transfer function C(s) of current Kp i
         ctr = pdTransfer(i);
+        % disp(ctr)
         % Compute transfer function of entire close loop system T(s)
         wholeTransfer = feedback(ctr*sys,1);
         % Calculate phase margin
-        [Gm,Pm,Wcg,Wcp] = margin(wholeTransfer);
+        [Gm,Pm,Wcg,Wcp] = margin(wholeTransfer,1);
         % Compare current phase margin with previous maximal phase margin
         if Pm > maxPMargin && Pm ~= Inf
             lastBestKp = bestKp;
@@ -26,7 +27,7 @@ function [bestKp,lastBestKp] = kpTuning(start,stop,step)
             maxPMargin = Pm;
         end
         iters = iters + 1;
-        if mod(iters,100) == 0
+        if mod(iters,10) == 0
             fprintf("Current iter: %i     bestKp: %f      maxPMargin: %f\n",iters,bestKp,maxPMargin)
         end
     end
