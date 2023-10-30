@@ -72,6 +72,11 @@ elseif label == 1 % Rotate to parallel to obstacle side
         e_prev = 0;
         u = [0,0];
         after_tick = y(1); % mark down start ticks
+        if abs(theta+pi/2)>pi/15
+            % slightly modify the ntick by 1
+            % disp(theta);
+            ntick = 1813;
+        end
     else
         % keep on ratation
         u = [0.5;-0.5];
@@ -187,9 +192,9 @@ elseif label == 6
         u = [0,0];
     else
         if theta > 0
-            u = [0.1*(theta-angle),-0.1*(theta-angle)];
+            u = [0.5*(theta-angle),-0.5*(theta-angle)];
         elseif theta < 0
-            u = [-0.1*(theta-angle),0.1*(theta-angle)];
+            u = [-0.5*(theta-angle),0.5*(theta-angle)];
         end
     end
 

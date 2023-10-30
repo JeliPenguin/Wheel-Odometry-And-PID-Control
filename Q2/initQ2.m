@@ -28,7 +28,7 @@ theta = 0;
 label = -1;
 
 start = 0; % start ticks
-ntick = 1813; % two round ticks
+ntick = 1814; % two round ticks
 
 % refenrence point when coming backward
 ref_x = 0;

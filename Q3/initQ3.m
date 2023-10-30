@@ -22,7 +22,7 @@ x_d = 0.4583;
 y_d = 0;
 
 
-% kid factors
+% pid factors
 Kp = 10;
 Ki = 0.2;
 Kd = 0;

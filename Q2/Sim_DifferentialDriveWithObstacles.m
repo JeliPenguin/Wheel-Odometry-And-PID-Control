@@ -6,7 +6,7 @@ close all;
 % Simulation parameters
 TOTAL_TIME  = 500;
 dt          = 0.02;
-TIME_SCALE  = 0.01; % slows down simulation if > 1, speeds up if < 1 (and if computation allows...)
+TIME_SCALE  = 0.1; % slows down simulation if > 1, speeds up if < 1 (and if computation allows...)
 % TIME_SCALE = 2;
 
 
@@ -25,6 +25,13 @@ ax1.Interactions = [];
 % Initialise Simulation
 robot = DifferentialDriveWithObstacles(ax1);
 robot.setState(zeros(9,1));
+
+%%%%%%%%%% test obstacle's different orientation and position %%%%%%%%%
+% robot.setState([0,0,0,0,pi/14,-0.1,-0.2,0,0])
+% robot.setState([0,0,0,0,pi/12,0.15,0.15,0,0])
+% robot.setState([0,0,0,0,-pi/10,0.1,0.15,0,0])
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 robot.setInput([0;0]);
 robot.updateOutput;
 csim = ControlSimulator(robot,TOTAL_TIME,dt);
@@ -36,6 +43,7 @@ robot.plot;
 %%%%%%%%%%%%%%%%%%%%%%%% IMPLEMENT THIS SCRIPT %%%%%%%%%%%%%%%%%%%%%%%%
 initQ2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 time = nan(1,csim.TotalSteps-1);
 % Run Simulation

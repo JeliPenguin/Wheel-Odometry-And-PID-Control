@@ -31,6 +31,7 @@ if theta < -pi
 end
 
 if label < 100
+    % Ciculating phase
     if abs(x_e-x_d) < 0.005 && abs(y_e-y_d) < 0.005
         label = label+1;
         x_d = lst(label,1);
@@ -64,6 +65,7 @@ if label < 100
     end
 
 elseif label == 100
+    % Final orientation adjustment phase
     if abs(theta) < 0.001
         e_i = 0;
         e_prev = 0;
