@@ -4,7 +4,7 @@ clear all;
 close all;
 
 % Simulation parameters
-TOTAL_TIME  = 500;
+TOTAL_TIME  = 1000;
 dt          = 0.02;
 TIME_SCALE  = 0.01; % slows down simulation if > 1, speeds up if < 1 (and if computation allows...)
 % TIME_SCALE = 2;
