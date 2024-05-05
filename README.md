@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains MATLAB code for simulating a differential drive robot with obstacle avoidance capabilities. The coursework tasks involve estimating wheel radii and distances between wheels to perform wheel odometry, and implementing various controllers to navigate around obstacles. For details please see `COMP0128__Robotic_Control_Theory_and_Systems_CW1.pdf`.
+This repository contains MATLAB code for simulating a differential drive robot with obstacle avoidance capabilities. The coursework tasks involve estimating wheel radii and distances between wheels to perform wheel odometry and implementing various controllers to navigate around obstacles. For details please see `Coursework1.pdf`. We have also written an in-depth report for our findings in `COMP0128__Robotic_Control_Theory_and_Systems_CW1.pdf`
 
 ## Installation
 
