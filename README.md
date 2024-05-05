@@ -45,16 +45,4 @@ Each task in the coursework is separated into different MATLAB script files with
 
 - Navigate to the `Q6` directory.
 - This section includes the discretization of the PD controller and its implementation as a digital filter.
-
-## Contributing
-
-Contributions to this project are welcome. Please fork the repository and submit a pull request with your changes.
-
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
-## Acknowledgments
-
-- University College London (UCL)
 - Course instructors and TAs
